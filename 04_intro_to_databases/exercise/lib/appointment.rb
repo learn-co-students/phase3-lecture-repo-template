@@ -7,10 +7,17 @@
 
 class Appointment
 
-  @@all = []
+  @@all = nil
 
   def self.all
-    @@all
+    rows = DB.execute("SELECT * FROM appointments")
+    @@all ||= rows.map do |row|
+      self.new_from_row(row)
+    end
+  end
+
+  def self.new_from_row(row)
+    self.new(row.transform_keys(&:to_sym))
   end
 
   def self.create(attributes)
@@ -30,16 +37,58 @@ class Appointment
   end
 
   attr_accessor :time, :doctor, :patient, :purpose, :notes, :canceled  
-
-  def initialize(time:, doctor:, patient:, purpose:)
+  attr_reader :id
+  def initialize(id: nil, time:, doctor:, patient:, purpose:, notes: nil, canceled: nil)
+    @id = id
     @time = time
     @doctor = doctor
     @patient = patient
     @purpose = purpose
+    @notes = notes
+    @canceled = canceled
   end
 
   def save
-    self.class.all << self
+    if id 
+      query = <<-SQL
+        UPDATE appointments
+        SET time = ?,
+            doctor = ?,
+            patient = ?,
+            purpose = ?,
+            notes = ?,
+            canceled = ?
+        WHERE
+            id = ? 
+      SQL
+      DB.execute(
+        query,
+        self.time,
+        self.doctor,
+        self.patient,
+        self.purpose,
+        self.notes,
+        self.canceled
+      )
+    else
+      query = <<-SQL
+        INSERT INTO appointments 
+        (time, doctor, patient, purpose, notes, canceled)
+        VALUES
+        (?, ?, ?, ?, ?, ?)
+      SQL
+      DB.execute(
+        query,
+        self.time,
+        self.doctor,
+        self.patient,
+        self.purpose,
+        self.notes,
+        self.canceled
+      )
+      @id = DB.execute("SELECT last_insert_rowid()")[0]["last_insert_rowid()"]
+      Appointment.all << self
+    end
     self
   end
 
@@ -72,24 +121,23 @@ end
 # application.
 
 
-Appointment.create(
-  time: "2:00 PM",
-  doctor: "Dr. Drew",
-  patient: "D",
-  purpose: "Physical"
-)
+# Appointment.create(
+#   time: "2:00 PM",
+#   doctor: "Dr. Drew",
+#   patient: "D",
+#   purpose: "Physical"
+# )
 
-Appointment.create(
-  time: "3:00 PM", 
-  doctor: "Dr. Zhivago", 
-  patient: "D", 
-  purpose: "Checkup"
-)
+# Appointment.create(
+#   time: "3:00 PM", 
+#   doctor: "Dr. Zhivago", 
+#   patient: "D", 
+#   purpose: "Checkup"
+# )
 
-Appointment.create(
-  time: "5:00 PM", 
-  doctor: "Dr. Zhivago", 
-  patient: "Laurence Fishburne", 
-  purpose: "Checkup"
-)
-
+# Appointment.create(
+#   time: "5:00 PM", 
+#   doctor: "Dr. Zhivago", 
+#   patient: "Laurence Fishburne", 
+#   purpose: "Checkup"
+# )
