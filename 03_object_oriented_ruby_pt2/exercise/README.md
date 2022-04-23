@@ -23,7 +23,7 @@ Before starting the Exercise today:
   - After choosing one of those menu options, create logic to allow users to choose which doctor/patient they want to view the appointments for.
   - rework the parts of the cli that were expecting to find all of our appointments in `APPOINTMENTS` to now use the `Appointment.all` method instead.
     - We'll use `Appointment.all` instead of `APPOINTMENTS` to access the array of all appointments.
-    - within the `add_appointment` method, we'll create an instance of the `Appointment` class using the `Appointment.create` method.
+    - within the `add_appointment` method, we'll save the appointment using the `#save` method rather than shoveling into the `APPOINTMENTS` constant.
 
 ### Logistics
 
