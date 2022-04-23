@@ -6,13 +6,41 @@
 #   - add a `.by_patient(patient)` method which accepts a patient name as an argument and returns all appointments with that patient.
 
 class Appointment
+
+  @@all = []
+
+  def self.all
+    @@all
+  end
+
+  def self.create(attributes)
+    self.new(attributes).save
+  end
+
+  def self.by_doctor(doctor)
+    self.all.filter do |appointment|
+      appointment.doctor == doctor
+    end
+  end
+
+  def self.by_patient(patient)
+    self.all.filter do |appointment|
+      appointment.patient == patient
+    end
+  end
+
   attr_accessor :time, :doctor, :patient, :purpose, :notes, :canceled  
 
-  def initialize(time, doctor, patient, purpose)
+  def initialize(time:, doctor:, patient:, purpose:)
     @time = time
     @doctor = doctor
     @patient = patient
     @purpose = purpose
+  end
+
+  def save
+    self.class.all << self
+    self
   end
 
   def cancel
@@ -21,14 +49,15 @@ class Appointment
 
   def print
     puts ""
-    if @canceled 
-      puts "#{@time} (canceled)".red
+    if self.canceled 
+      puts "#{self.time} (canceled)".red
     else 
-      puts @time.light_green
+      puts self.time.light_green
     end
-    puts "  Doctor: #{@doctor}"
-    puts "  Purpose: #{@purpose}"
-    puts "  Notes: #{@notes}"
+    puts "  Doctor: #{self.doctor}"
+    puts "  Patient: #{self.patient}"
+    puts "  Purpose: #{self.purpose}"
+    puts "  Notes: #{self.notes}"
     puts ""
   end
 
@@ -43,23 +72,23 @@ end
 # application.
 
 
-# Appointment.create(
-#   time: "2:00 PM",
-#   doctor: "Dr. Drew",
-#   patient: "D",
-#   purpose: "Physical"
-# )
+Appointment.create(
+  time: "2:00 PM",
+  doctor: "Dr. Drew",
+  patient: "D",
+  purpose: "Physical"
+)
 
-# Appointment.create(
-#   time: "3:00 PM", 
-#   doctor: "Dr. Zhivago", 
-#   patient: "D", 
-#   purpose: "Checkup"
-# )
+Appointment.create(
+  time: "3:00 PM", 
+  doctor: "Dr. Zhivago", 
+  patient: "D", 
+  purpose: "Checkup"
+)
 
-# Appointment.create(
-#   time: "5:00 PM", 
-#   doctor: "Dr. Zhivago", 
-#   patient: "Laurence Fishburne", 
-#   purpose: "Checkup"
-# )
+Appointment.create(
+  time: "5:00 PM", 
+  doctor: "Dr. Zhivago", 
+  patient: "Laurence Fishburne", 
+  purpose: "Checkup"
+)
