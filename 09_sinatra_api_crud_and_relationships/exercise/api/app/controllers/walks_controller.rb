@@ -24,7 +24,12 @@ class WalksController < ApplicationController
 
   def serialize(objects)
     objects.to_json(
-      methods: :formatted_time
+      methods: :formatted_time,
+      include: {
+        dog_walks: {
+          include: [:dog]
+        }
+      }
     )
   end
 end
