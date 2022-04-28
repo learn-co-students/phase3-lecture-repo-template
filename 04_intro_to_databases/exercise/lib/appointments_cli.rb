@@ -2,12 +2,11 @@ def start_cli
   puts "Hi! Welcome to the Appointments CLI"
   main_menu
   choice = ask_for_input
-  until choice == "exit"
+  loop do 
     handle_user_choice(choice)
     main_menu
     choice = ask_for_input("What would you like to do? ")
   end
-  puts "Thanks for using the appointments CLI!"
 end
 
 def main_menu

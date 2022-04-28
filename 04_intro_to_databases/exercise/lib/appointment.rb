@@ -10,8 +10,7 @@ class Appointment
   @@all = nil
 
   def self.all
-    rows = DB.execute("SELECT * FROM appointments")
-    @@all ||= rows.map do |row|
+    @@all ||= DB.execute("SELECT * FROM appointments").map do |row|
       self.new_from_row(row)
     end
   end
